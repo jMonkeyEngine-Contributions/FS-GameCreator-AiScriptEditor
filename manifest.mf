@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: com.ractoc.fs.ai.script.editor
+OpenIDE-Module-Implementation-Version: 0
+OpenIDE-Module-Localizing-Bundle: com/ractoc/fs/ai/script/editor/Bundle.properties
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
+
