@@ -7,12 +7,22 @@ import com.jme3.gde.core.assets.ProjectAssetManager;
 import com.ractoc.fs.ai.AiScript;
 import com.ractoc.fs.parsers.ai.AiScriptKey;
 import com.ractoc.fs.ai.script.editor.AisOpenSupport;
+import com.ractoc.fs.parsers.ai.AiScriptLoader;
 import com.ractoc.fs.parsers.ai.AiScriptWriter;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.api.project.SourceGroup;
+import org.netbeans.api.project.Sources;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
@@ -22,7 +32,6 @@ import org.openide.cookies.CloseCookie;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.MIMEResolver;
-import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiFileLoader;
@@ -101,6 +110,8 @@ public class AisDataObject extends AssetDataObject {
     private Project project;
     private String fileName;
     private AiScript script;
+    private URLClassLoader loader;
+    private List<URL> urls;
     private static final Logger LOG = Logger.getLogger(AisDataObject.class.getName());
 
     public AisDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {
@@ -127,7 +138,57 @@ public class AisDataObject extends AssetDataObject {
         setupManager();
         setupProject();
         extractFileName();
+        setupClassLoader();
         return loadScriptFile();
+    }
+
+    private void setupClassLoader() {
+        SourceGroup[] groups = getSourceGroupFromProject();
+        getURLsFromSourceGroups(groups);
+        addClassLoader();
+    }
+
+    private SourceGroup[] getSourceGroupFromProject() {
+        Sources sources = ProjectUtils.getSources(project);
+        SourceGroup[] groups = sources.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
+        return groups;
+    }
+
+    private void getURLsFromSourceGroups(SourceGroup[] groups) {
+        urls = new LinkedList<URL>();
+        for (SourceGroup sourceGroup : groups) {
+            getUrlsFromSourceGroup(sourceGroup);
+        }
+    }
+
+    private void addClassLoader() {
+        loader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
+        manager.addClassLoader(loader);
+        AiScriptLoader.setClassLoader(loader);
+    }
+
+    private void getUrlsFromSourceGroup(SourceGroup sourceGroup) {
+        ClassPath path = ClassPath.getClassPath(sourceGroup.getRootFolder(), ClassPath.EXECUTE);
+        if (path != null) {
+            getURLsFromPath(path);
+        }
+    }
+
+    private void getURLsFromPath(ClassPath path) {
+        FileObject[] roots = path.getRoots();
+        for (FileObject fileObject : roots) {
+            addURLfromFileObject(fileObject);
+        }
+    }
+
+    private void addURLfromFileObject(FileObject fileObject) {
+        if (shouldURLbeAdded(fileObject)) {
+            urls.add(fileObject.toURL());
+        }
+    }
+
+    private boolean shouldURLbeAdded(FileObject fileObject) {
+        return !fileObject.equals(manager.getAssetFolder()) && !urls.contains(fileObject.toURL());
     }
 
     private void setupManager() {

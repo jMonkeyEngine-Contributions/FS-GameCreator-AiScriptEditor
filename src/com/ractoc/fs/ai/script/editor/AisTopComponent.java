@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.ractoc.fs.ai.script.editor;
 
 import com.ractoc.fs.ai.AiScript;
@@ -16,9 +12,6 @@ import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.CloneableTopComponent;
 
-/**
- * Top component which displays something.
- */
 @ConvertAsProperties(
         dtd = "-//com.ractoc.fs.ai.script.editor//Ais//EN",
         autostore = false)
@@ -26,7 +19,7 @@ import org.openide.windows.CloneableTopComponent;
         preferredID = "AisTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE",
         persistenceType = TopComponent.PERSISTENCE_ALWAYS)
-@TopComponent.Registration(mode = "editor", openAtStartup = true)
+@TopComponent.Registration(mode = "editor", openAtStartup = false)
 @ActionID(category = "Window", id = "com.ractoc.fs.ai.script.editor.AisTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(

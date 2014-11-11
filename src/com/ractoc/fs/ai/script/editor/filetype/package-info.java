@@ -1,8 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-@TemplateRegistration(folder = "Other", content = "AisDataObjectTemplate.ais")
+@TemplateRegistration(folder = "FS", content = "AisDataObjectTemplate.ais", displayName="AI Script File")
 package com.ractoc.fs.ai.script.editor.filetype;
 
 import org.netbeans.api.templates.TemplateRegistration;

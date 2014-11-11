@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.ractoc.fs.ai.script.editor;
 
 import com.jme3.gde.core.assets.AssetData;
